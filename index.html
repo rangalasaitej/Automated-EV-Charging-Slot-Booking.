@@ -2,193 +2,102 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Automated EV Charging Slot Booking</title>
+    <title>India EV Slot Booking 2026</title>
     <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body { background-color: #e9ecef; margin: 0; padding: 0; color: #333; }
-        header { background-color: #1a252f; color: #00d2ff; padding: 1.5rem 0; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; }
-        header p { color: white; margin-top: 5px; }
-        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
-        .card { background-color: white; padding: 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); margin-bottom: 25px; border-top: 4px solid #3498db; }
-        h2 { color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 0; font-size: 20px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; color: #555; }
-        input[type="text"], input[type="time"], input[type="date"], select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; background-color: #f8f9fa; transition: border 0.3s; }
-        input:focus, select:focus { border-color: #3498db; outline: none; }
-        .btn { background-color: #27ae60; color: white; border: none; padding: 14px 20px; font-size: 16px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; transition: background 0.3s; margin-top: 10px; }
-        .btn:hover { background-color: #219653; }
-        .btn:disabled { background-color: #95a5a6; cursor: not-allowed; }
-        .station-list { list-style-type: none; padding: 0; margin: 0; }
-        .station-item { background: #f8f9fa; border-left: 5px solid #3498db; margin-bottom: 10px; padding: 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
-        .status-badge { padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; }
-        .slots-available { background-color: #d4edda; color: #155724; }
-        .slots-full { background-color: #f8d7da; color: #721c24; }
-        .kw-tag { display: inline-block; background: #e2e8f0; padding: 3px 8px; border-radius: 4px; font-size: 12px; color: #4a5568; margin-top: 5px; font-weight: bold;}
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; }
+        .overlay { position: fixed; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; display: flex; justify-content: center; align-items: center; }
+        .card { background: white; padding: 25px; border-radius: 10px; width: 380px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .container { max-width: 900px; margin: 20px auto; background: white; padding: 30px; border-radius: 10px; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .admin-view { border-top: 5px solid #007bff; display: none; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
+        button:hover { background: #0056b3; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background-color: #007bff; color: white; }
+        .logout-btn { background: #6c757d; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>⚡ Smart EV Slot Booking</h1>
-        <p>User: R Saitej | Department of ECE</p>
-    </header>
-
-    <div class="container">
-        
-        <div class="card">
-            <h2>📍 Find Nearby EV Chargers</h2>
-            <div class="grid-2">
-                <div class="form-group">
-                    <label for="location">Enter City or Pincode:</label>
-                    <input type="text" id="location" placeholder="e.g., 500090">
-                </div>
-                <div class="form-group">
-                    <label>&nbsp;</label>
-                    <button class="btn" style="background-color: #3498db;" onclick="searchStations()">Search</button>
-                </div>
-            </div>
+    <div id="auth-layer" class="overlay">
+        <div class="card" id="login-box">
+            <h2>⚡ EV System Login</h2>
+            <input type="text" id="l-user" placeholder="Username">
+            <input type="password" id="l-pass" placeholder="Password">
+            <button onclick="handleLogin()">Sign In</button>
+            <p style="font-size:13px; margin-top:15px;">
+                <span style="color:blue; cursor:pointer;" onclick="toggleAuth('signup')">New Account</span> | 
+                <span style="color:red; cursor:pointer;" onclick="forgot()">Forgot Password?</span>
+            </p>
         </div>
 
-        <div class="card">
-            <h2>🔋 Live Station Availability</h2>
-            <ul class="station-list" id="station-results">
-                <li class="station-item">
-                    <div><strong>Awaiting Search...</strong><br><small>Enter a location above.</small></div>
-                </li>
-            </ul>
+        <div class="card" id="signup-box" style="display:none;">
+            <h2>Register Account</h2>
+            <input type="text" id="s-phone" placeholder="Full Mobile Number">
+            <input type="text" id="s-user" placeholder="Create Username">
+            <input type="password" id="s-pass" placeholder="Create Password">
+            <button onclick="handleSignup()">Create Account</button>
+            <p style="font-size:13px; margin-top:15px; color:blue; cursor:pointer;" onclick="toggleAuth('login')">Back to Login</p>
         </div>
-
-        <div class="card">
-            <h2>📅 Reserve Your Charging Slot</h2>
-            <form id="booking-form" onsubmit="bookSlot(event)">
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label for="car-model">Select Your EV & Battery Capacity:</label>
-                        <select id="car-model" required style="height: 150px;" size="5">
-                            <optgroup label="Tata Motors">
-                                <option value="tiago_24">Tata Tiago EV (24 kWh)</option>
-                                <option value="punch_35">Tata Punch EV (35 kWh)</option>
-                                <option value="nexon_40">Tata Nexon EV LR (40.5 kWh)</option>
-                                <option value="curvv_55">Tata Curvv EV (55 kWh)</option>
-                            </optgroup>
-                            <optgroup label="MG Motor & BYD">
-                                <option value="comet_17">MG Comet EV (17.3 kWh)</option>
-                                <option value="zs_50">MG ZS EV (50.3 kWh)</option>
-                                <option value="atto3_60">BYD Atto 3 (60.4 kWh)</option>
-                                <option value="seal_82">BYD Seal (82.5 kWh)</option>
-                            </optgroup>
-                            <optgroup label="Mahindra & Others">
-                                <option value="xuv400_39">Mahindra XUV400 (39.4 kWh)</option>
-                                <option value="ioniq5_72">Hyundai Ioniq 5 (72.6 kWh)</option>
-                                <option value="ev6_77">Kia EV6 (77.4 kWh)</option>
-                            </optgroup>
-                            <optgroup label="Tesla & Luxury">
-                                <option value="tesla_3_75">Tesla Model 3 (75 kWh)</option>
-                                <option value="tesla_y_81">Tesla Model Y (81 kWh)</option>
-                                <option value="bmw_i4_83">BMW i4 (83.9 kWh)</option>
-                                <option value="audi_q8_95">Audi Q8 e-tron (95 kWh)</option>
-                            </optgroup>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="charger-type">Required Charger Type:</label>
-                        <select id="charger-type" required>
-                            <option value="">-- Choose Charger --</option>
-                            <option value="dc_120">DC Ultra-Fast Charger (120 kW)</option>
-                            <option value="dc_50">DC Fast Charger (50 kW)</option>
-                            <option value="ac_7">AC Normal Charger (7.2 kW)</option>
-                            <option value="ac_3">AC Slow Charger (3.3 kW)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="station-select">Select Station:</label>
-                        <select id="station-select" required>
-                            <option value="klh">KLH Bachupally EV Hub</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="time">Estimated Arrival Time:</label>
-                        <input type="time" id="time" required>
-                    </div>
-                </div>
-                
-                <button type="submit" class="btn" id="submit-btn">Confirm Booking</button>
-            </form>
-        </div>
-
     </div>
 
-    <script>
-        let klhAvailableSlots = 2; 
-        let hasSearched = false;
+    <div id="user-container" class="container">
+        <h1 style="color:#007bff; text-align:center;">⚡ Book Your Slot</h1>
+        <p style="text-align:center;">User: <span id="user-tag" style="font-weight:bold;"></span> | Dept of ECE</p>
+        <hr>
+        
+        <label>Driver Details:</label>
+        <input type="text" id="u-name" placeholder="Full Name">
+        <input type="text" id="u-phone" placeholder="Contact Number">
+        
+        <label>Select Car Model:</label>
+        <select id="car-list">
+            <optgroup label="Maruti Suzuki"><option>Maruti Suzuki e Vitara (eVX)</option></optgroup>
+            <optgroup label="Tesla"><option>Tesla Model 3</option><option>Tesla Model Y Premium</option></optgroup>
+            <optgroup label="Luxury Brands"><option>BMW i4</option><option>BMW iX</option><option>Mercedes EQS</option><option>Audi Q8 e-tron</option></optgroup>
+            <optgroup label="Mainstream"><option>Tata Nexon EV</option><option>MG Windsor EV</option><option>MG ZS EV</option><option>Mahindra XEV 9e</option></optgroup>
+        </select>
 
-        function renderStations() {
-            const resultsList = document.getElementById('station-results');
-            
-            if (klhAvailableSlots > 0) {
-                resultsList.innerHTML = `
-                    <li class="station-item">
-                        <div>
-                            <strong>KLH Bachupally EV Hub</strong><br>
-                            <span class="kw-tag">⚡ DC Fast (50 kW - 120 kW)</span>
-                            <span class="kw-tag">🔌 AC Normal (7.2 kW)</span>
-                        </div>
-                        <span class="status-badge slots-available">✅ ${klhAvailableSlots} Slots Available</span>
-                    </li>
-                `;
-                document.getElementById('submit-btn').disabled = false;
-                document.getElementById('submit-btn').innerText = "Confirm Booking";
-                document.getElementById('submit-btn').style.backgroundColor = "#27ae60";
-            } else {
-                resultsList.innerHTML = `
-                    <li class="station-item" style="border-left-color: #e74c3c;">
-                        <div>
-                            <strong>KLH Bachupally EV Hub</strong><br>
-                            <span class="kw-tag">⚡ DC Fast (50 kW - 120 kW)</span>
-                            <span class="kw-tag">🔌 AC Normal (7.2 kW)</span>
-                        </div>
-                        <span class="status-badge slots-full">❌ Slots are over</span>
-                    </li>
-                `;
-                document.getElementById('submit-btn').disabled = true;
-                document.getElementById('submit-btn').innerText = "Station Full";
-                document.getElementById('submit-btn').style.backgroundColor = "#95a5a6";
-            }
-        }
+        <label>Charging Options:</label>
+        <select id="charger-type">
+            <option>⚡ DC Fast Charging (High Speed)</option>
+            <option>🔌 AC Normal Charging (Slow)</option>
+        </select>
 
-        function searchStations() {
-            const searchInput = document.getElementById('location').value;
-            if (searchInput.trim() === "") {
-                alert("Please enter a valid pincode.");
-                return;
-            }
-            hasSearched = true;
-            renderStations();
-        }
+        <label>Select Slot & Start Time:</label>
+        <div style="display: flex; gap: 10px;">
+            <select id="slot-select" style="flex: 1;">
+                <option value="1">Slot 1</option><option value="2">Slot 2</option>
+                <option value="3">Slot 3</option><option value="4">Slot 4</option>
+                <option value="5">Slot 5</option>
+            </select>
+            <input type="time" id="start-time" style="flex: 2;">
+        </div>
+        
+        <button onclick="bookSlot()" style="background:#28a745; margin-top:20px;">Confirm Booking</button>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
 
-        function bookSlot(event) {
-            event.preventDefault(); 
-            
-            if (!hasSearched) {
-                alert("Please search for a station first!");
-                return;
-            }
+    <div id="admin-container" class="container admin-view">
+        <h1 style="text-align:center; color:#007bff;">Admin Log (S@itej)</h1>
+        <p style="text-align:center;">Total Station Occupancy: <span id="load" style="font-weight:bold;">0</span>/5</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Slot #</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Car Model</th>
+                    <th>Charger</th>
+                    <th>Start Time</th>
+                </tr>
+            </thead>
+            <tbody id="admin-log"></tbody>
+        </table>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
 
-            if (klhAvailableSlots > 0) {
-                const carModel = document.getElementById('car-model').options[document.getElementById('car-model').selectedIndex].text;
-                const chargerType = document.getElementById('charger-type').options[document.getElementById('charger-type').selectedIndex].text;
-                klhAvailableSlots--; 
-                
-                alert(`Success! Slot booked.\n\nVehicle: ${carModel}\nCharger: ${chargerType}\nRemaining slots: ${klhAvailableSlots}`);
-                renderStations(); 
-            }
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
